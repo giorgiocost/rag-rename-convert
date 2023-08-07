@@ -24,7 +24,7 @@ def get_commit_messages():
     return commit_messages
 
 # Função para gerar o changelog.md
-def generate_changelog():
+def generate_changelog(new_version):
     commit_messages = get_commit_messages()
     change_log = defaultdict(list)
 
@@ -39,8 +39,9 @@ def generate_changelog():
             change_log[commit_scope].append(f'* {commit_date.strftime("%Y-%m-%d")}: {commit_description}')
 
     with open('changelog.md', 'w') as changelog_file:
+        changelog_file.write(f'## Version {new_version}\n\n')  # Write version at the top
         for scope, changes in change_log.items():
-            changelog_file.write(f'## {scope.capitalize()}\n\n')
+            changelog_file.write(f'### {scope.capitalize()}\n\n')
             changelog_file.write('\n'.join(changes))
             changelog_file.write('\n\n')
 
@@ -50,7 +51,8 @@ start_time = time.time()
 # ... (resto do seu código existente)
 
 # Gera o changelog.md
-generate_changelog()
+new_version = get_incremented_version(commit_messages)
+generate_changelog(new_version)
 
 # Obtém as mensagens de commit
 commit_messages = get_commit_messages()
