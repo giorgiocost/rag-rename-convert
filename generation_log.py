@@ -23,6 +23,25 @@ def get_commit_messages():
 
     return commit_messages
 
+# Função para obter a versão incrementada com base nos tipos de commit
+def get_incremented_version(commit_messages):
+    version_parts = [0, 1, 0]  # Initial version format: major.minor.patch
+    for message in commit_messages.values():
+        match = re.match(r'^(?P<type>[a-z]+)(?:\((?P<scope>[^\)]+)\))?:(?P<description>.+)$', message)
+        if match:
+            commit_type = match.group('type')
+            if commit_type == 'feat':
+                version_parts[1] += 1  # Increment minor version for feature
+            elif commit_type == 'fix':
+                version_parts[2] += 1  # Increment patch version for fix
+            elif commit_type == 'perf':
+                version_parts[1] += 1  # Increment minor version for performance improvement
+            elif commit_type == 'chore':
+                pass  # No version change for chore commits
+            # Add more conditions for other types if needed
+
+    return '.'.join(map(str, version_parts))
+
 # Função para gerar o changelog.md
 def generate_changelog(new_version):
     commit_messages = get_commit_messages()
@@ -50,34 +69,15 @@ start_time = time.time()
 
 # ... (resto do seu código existente)
 
-# Gera o changelog.md
-new_version = get_incremented_version(commit_messages)
-generate_changelog(new_version)
-
 # Obtém as mensagens de commit
 commit_messages = get_commit_messages()
 
-# Função para obter a versão incrementada com base nos tipos de commit
-def get_incremented_version(commit_messages):
-    version_parts = [0, 1, 0]  # Initial version format: major.minor.patch
-    for message in commit_messages.values():
-        match = re.match(r'^(?P<type>[a-z]+)(?:\((?P<scope>[^\)]+)\))?:(?P<description>.+)$', message)
-        if match:
-            commit_type = match.group('type')
-            if commit_type == 'feat':
-                version_parts[1] += 1  # Increment minor version for feature
-            elif commit_type == 'fix':
-                version_parts[2] += 1  # Increment patch version for fix
-            elif commit_type == 'perf':
-                version_parts[1] += 1  # Increment minor version for performance improvement
-            elif commit_type == 'chore':
-                pass  # No version change for chore commits
-            # Add more conditions for other types if needed
-
-    return '.'.join(map(str, version_parts))
-
 # Obtém a versão incrementada
 new_version = get_incremented_version(commit_messages)
+
+# Gera o changelog.md
+generate_changelog(new_version)
+
 print(colored(f'Incremented version to {new_version}', 'light_blue'))
 
 end_time = time.time()
